@@ -25,16 +25,15 @@ ENV		 dadir			 /opt/ranger-2.0.0-SNAPSHOT-admin
 # Let's start with some core packages we need
 RUN apt-get update && apt-get install -y wget libmysql-java python openjdk-8-jdk maven git iputils-ping net-tools vim lsof apt-utils build-essential lsb-core lsb-release
 
-# It turns out mvn 3.5.3 (current on ubuntu distro) nor 3.5.2 work with ranger. 3.5.0 or 3.5.4 only
 WORKDIR /root
-RUN wget http://mirror.vorboss.net/apache/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz
-RUN gunzip -c apache-maven-3.5.4-bin.tar.gz | tar -xvf -
+RUN wget http://mirror.vorboss.net/apache/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
+RUN gunzip -c apache-maven-3.6.3-bin.tar.gz | tar -xvf -
 
 # Setup some environment variables for later
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
 
 # Add Java 8 and Maven to the path.
-ENV PATH /root/apache-maven-3.5.4/bin:/usr/lib/jvm/java-8-openjdk-amd64/bin:/usr/local/apache-maven/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV PATH /root/apache-maven-3.6.3/bin:/usr/lib/jvm/java-8-openjdk-amd64/bin:/usr/local/apache-maven/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
  # Working directory - root home
 WORKDIR /root
@@ -44,7 +43,7 @@ RUN git clone http://github.com/apache/ranger.git -b master
 
  # Remove -DskipTests if unit tests are to be included - build the code...
 WORKDIR /root/ranger
-RUN mvn -DskipTests=true clean compile package install assembly:assembly
+RUN mvn -DskipTests=true -Dhttp.keepAlive=false clean compile package install assembly:assembly
 
 # We have now built the latest ranger from source - let's unpack and setup the admin server & UI
 
